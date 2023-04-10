@@ -83,7 +83,7 @@ export default function Editor() {
     const pdf = new jsPDF();
 
     pdf.addImage(imgData, "JPEG", 0, 0);
-    pdf.save("download.pdf");
+    pdf.save(`${selected.image}.pdf`);
   };
 
   return (
