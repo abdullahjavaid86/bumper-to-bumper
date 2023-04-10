@@ -1,46 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext } from "react";
+
+import { ImageSelectionContext } from "@/contexts/image-selection-context";
 
 export default function Home() {
+  const { images, onSearch, setSelected } = useContext(ImageSelectionContext);
+
+  const onImageSearch = (e) => {
+    onSearch(e.target.value);
+  };
+
   return (
     <div className="home">
       <h1>Select Image</h1>
-    <input type="text" placeholder="Search for trucks"></input>
+      <input
+        type="text"
+        placeholder="Search for trucks"
+        onChange={onImageSearch}
+      />
       <div className="flex-container">
-        <div className="cardSelection">
-          <img src="./sampleTruck.png" />
-          <h3>Card Title 1</h3>
-          <p>Card description goes here</p>
-        </div>
-        <div className="cardSelection">
-          <img src="./sampleTruck.png" />
-          <h3>Card Title 2</h3>
-          <p>Card description goes here</p>
-        </div>
-        <div className="cardSelection">
-          <img src="./sampleTruck.png" />
-          <h3>Card Title 3</h3>
-          <p>Card description goes here</p>
-        </div>
-        <div className="cardSelection">
-          <img src="./sampleTruck.png" />
-          <h3>Card Title 4</h3>
-          <p>Card description goes here</p>
-        </div>
-        <div className="cardSelection">
-          <img src="./sampleTruck.png" />
-          <h3>Card Title 4</h3>
-          <p>Card description goes here</p>
-        </div>
-        <div className="cardSelection">
-          <img src="./sampleTruck.png" />
-          <h3>Card Title 4</h3>
-          <p>Card description goes here</p>
-        </div>
-        <div className="cardSelection">
-          <img src="./sampleTruck.png" />
-          <h3>Card Title 4</h3>
-          <p>Card description goes here</p>
-        </div>
+        {images.map((item) => (
+          <div
+            key={item.title}
+            className="cardSelection"
+            onClick={() => setSelected(item, true)}
+          >
+            <img src={item.image} />
+            <h3>{item.title}</h3>
+            <p>{item.description}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
