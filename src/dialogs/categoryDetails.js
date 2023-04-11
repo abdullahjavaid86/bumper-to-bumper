@@ -71,7 +71,7 @@ const styles = {
 };
 
 export default function CategoryDetails(props) {
-  const { open, handleClose, itemData, upDateItem, setSelectedCategory } = props;
+  const { open, handleClose, itemData, upDateItem, setSelectedCategory, renderCategoryDetails } = props;
   const [newProduct, setNewProduct] = useState("");
   const [products, setProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
@@ -101,6 +101,7 @@ export default function CategoryDetails(props) {
 
   const handleEdit = () => {
     setSelectedCategory({ id: itemData.id, category: itemData.category, products: selectedProducts });
+    renderCategoryDetails();
     handleCloseDialog();
   }
 

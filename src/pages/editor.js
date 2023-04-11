@@ -14,9 +14,9 @@ export default function Editor() {
 
   const { push } = useRouter();
   const [isDrawingMode, setIsDrawingMode] = useState(false);
-
-  // Selected Category and Its selected products from edit modal
   const [selectedCategory, setSelectedCategory] = useState({}); 
+
+  const isEmpty = (object) => JSON.stringify(object) === "{}"? true : false;
 
   useEffect(() => {
     if (!selected.hasOwnProperty("image")) {
@@ -125,6 +125,31 @@ export default function Editor() {
     canvas.centerObject(textbox);
   };
 
+  const renderCategoryDetails = () => { 
+    if(isEmpty(selectedCategory)) return;
+    const canvas = editor.canvas;
+    const categoryNameBox = new fabric.Textbox(selectedCategory.category, {
+      left: 50,
+      top: 50,
+      width: 200,
+      fontSize: 14,
+      fontWeight: "bold",
+      backgroundColor: "#1565C0"
+    });
+    canvas.add(categoryNameBox);
+    selectedCategory.products.forEach((product)=> {
+      const productNameBox = new fabric.Textbox(product.name, {
+        left: 50,
+        top: 50,
+        width: 200,
+        fontSize: 14,
+        backgroundColor: "#81b8f7"
+      });
+      canvas.add(productNameBox);
+    })
+
+  };
+
   return (
     <Box
       sx={{
@@ -143,6 +168,7 @@ export default function Editor() {
         <Box sx={{ border: "2px solid grey", gridArea: "side" }}>
           <SideBar 
             setSelectedCategory={setSelectedCategory}
+            renderCategoryDetails={renderCategoryDetails}
           />
         </Box>
         <Box sx={{ gridArea: "main" }}>
