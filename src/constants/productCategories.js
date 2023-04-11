@@ -1,7 +1,7 @@
 export const PRODUCT_CATEGORY = [
   {
     id: 1,
-    category: "Product Category 1",
+    category: "My Category 1",
     products: [
       {
         id: 1,
@@ -19,7 +19,7 @@ export const PRODUCT_CATEGORY = [
   },
   {
     id: 2,
-    category: "Product Category 2",
+    category: "My Category 2",
     products: [
       {
         id: 1,
@@ -37,7 +37,7 @@ export const PRODUCT_CATEGORY = [
   },
   {
     id: 3,
-    category: "Product Category 3",
+    category: "My Category 3",
     products: [
       {
         id: 1,
@@ -55,7 +55,7 @@ export const PRODUCT_CATEGORY = [
   },
   {
     id: 4,
-    category: "Product Category 4",
+    category: "My Category 4",
     products: [
       {
         id: 1,

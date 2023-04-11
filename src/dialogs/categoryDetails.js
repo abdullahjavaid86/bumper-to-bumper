@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import * as Yup from "yup";
 import { Form, Formik } from "formik";
-import { styled as muiStyled } from "@mui/material/styles";
 import {
   DialogTitle,
   Dialog,
@@ -15,6 +14,7 @@ import {
   Divider,
   FormControl,
   TextField,
+  Checkbox,
 } from "@mui/material";
 import CloseIcon from "../icons/closeIcon";
 import RemoveIcon from "@/icons/removeIcon";
@@ -31,6 +31,12 @@ const styles = {
     justifyContent: "center",
     alignItems: "start",
     margin: "0% 4%",
+  },
+  displayFlex: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
   },
   details: {
     width: "100%",
@@ -64,15 +70,39 @@ const styles = {
   },
 };
 
-const StCheckBoxLabel = muiStyled(Box)(({ theme }) => ({
-  fontFamily: "Montserrat",
-}));
-
 export default function CategoryDetails(props) {
-  const { open, handleClose, itemData, upDateItem } = props;
+  const { open, handleClose, itemData, upDateItem, setSelectedCategory } = props;
   const [newProduct, setNewProduct] = useState("");
   const [products, setProducts] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [isUpdateProcess, setIsUpdateProcess] = useState(true);
   const [messege, setMessege] = useState("");
+
+  const handleCloseDialog = () => {
+    handleClose();
+    setSelectedProducts([]);
+    setIsUpdateProcess(true);
+  }
+
+  const handleProcessType = () => {
+    setIsUpdateProcess(!isUpdateProcess);
+    setSelectedProducts([]);
+  };
+
+  const handleSelectedProduct = (product) => {
+    const isExistingProduct = selectedProducts.find(p => p.id === product.id);
+    if (isExistingProduct) {
+      const filterSelectedProducts= selectedProducts.filter(p => p.id !== product.id);
+      setSelectedProducts(filterSelectedProducts);
+    } else {
+      setSelectedProducts([...selectedProducts, product]);
+    }
+  }
+
+  const handleEdit = () => {
+    setSelectedCategory({ id: itemData.id, category: itemData.category, products: selectedProducts });
+    handleCloseDialog();
+  }
 
   const handleDeleteProducts = (id) => {
     const filterProducts = products.filter((product) => product.id !== id);
@@ -84,19 +114,18 @@ export default function CategoryDetails(props) {
   };
 
   const addNewProduct = () => {
-    if (newProduct) {
-      setProducts([...products, { id: products.length + 1, name: newProduct }]);
-      setNewProduct("");
-      setMessege("New Product has been added successfully");
-      setTimeout(() => {
-        setMessege("");
-      }, 3000);
-    }
+    if (!newProduct) return;
+    setProducts([...products, {id: products.length + 1, name: newProduct.trim().length? newProduct : "No Name"}]);
+    setNewProduct("");
+    setMessege("New Product has been added successfully");
+    setTimeout(() => {
+      setMessege("");
+    }, 3000);
   };
 
   const handleUpdateCategory = () => {
     upDateItem(itemData.id, products);
-    handleClose();
+    handleCloseDialog();
   };
 
   const validationSchema = Yup.object({
@@ -110,10 +139,10 @@ export default function CategoryDetails(props) {
   return (
     <Dialog open={open} fullWidth={true} maxWidth="sm" scroll="body">
       <DialogTitle sx={styles.title}>
-        {"Category Products Details"}
+        Category Products Details
         <IconButton
           aria-label="close"
-          onClick={handleClose}
+          onClick={handleCloseDialog}
           sx={{
             position: "absolute",
             right: 8,
@@ -125,9 +154,20 @@ export default function CategoryDetails(props) {
         </IconButton>
       </DialogTitle>
       <Box sx={styles.displayCenter}>
-        <p style={styles.details}>
-          Category Name: <span style={styles.name}>{itemData.category}</span>
-        </p>
+        <Box sx={styles.displayFlex}>
+          <p style={styles.details}>
+            Category Name: <span style={styles.name}>{itemData.category}</span>
+          </p>
+          {isUpdateProcess && (
+            <Button
+              variant="contained"
+              sx={styles.submit}
+              onClick={handleProcessType}
+            >
+              Edit
+            </Button>
+          )}
+        </Box>
         <p style={styles.product}>Products:</p>
         <Box sx={{ width: "100%", bgcolor: "background.paper" }}>
           <nav aria-label="main mailbox folders">
@@ -136,17 +176,25 @@ export default function CategoryDetails(props) {
                 products.map((product, index) => (
                   <>
                     <ListItem key={index} disablePadding>
+                      {!isUpdateProcess &&
+                        <Checkbox 
+                          color="success"
+                          onClick={() => {handleSelectedProduct(product)}}
+                        />
+                      }
                       <ListItemButton>
                         <ListItemText primary={`${product.name}`} />
                       </ListItemButton>
-                      <IconButton
-                        title="Delete Product"
-                        onClick={() => {
-                          handleDeleteProducts(product.id);
-                        }}
-                      >
-                        <RemoveIcon color="#BDBDBD" />
-                      </IconButton>
+                      {isUpdateProcess && (
+                        <IconButton
+                          title="Delete Product"
+                          onClick={() => {
+                            handleDeleteProducts(product.id);
+                          }}
+                        >
+                          <RemoveIcon color="#BDBDBD" />
+                        </IconButton>
+                      )}
                     </ListItem>
                     <Divider />
                   </>
@@ -160,7 +208,7 @@ export default function CategoryDetails(props) {
             {messege && <span style={{ color: "#2CB23B" }}>{messege}</span>}
           </nav>
         </Box>
-        <p style={styles.product}>Add New Products:</p>
+        {isUpdateProcess && <p style={styles.product}>Add New Products:</p>}
         <Formik
           initialValues={{ product: "" }}
           validationSchema={validationSchema}
@@ -169,42 +217,61 @@ export default function CategoryDetails(props) {
           {({ errors }) => (
             <>
               <Form>
-                <FormControl sx={{ mb: 2 }} variant="outlined">
-                  <TextField
-                    sx={{
-                      width: { sm: 200, md: 450 },
-                    }}
-                    label={`New Product`}
-                    variant="outlined"
-                    name="product"
-                    id="product"
-                    type="text"
-                    value={newProduct}
-                    onChange={() => setNewProduct(event.target.value)}
-                    helperText={errors.product ?? ""}
-                  />
-                </FormControl>
-                <Button
-                  sx={styles.addMore}
-                  onClick={addNewProduct}
-                  variant="contained"
-                  color="success"
-                  type="submit"
-                >
-                  + Add New Product
-                </Button>
+                {isUpdateProcess && (
+                  <>
+                    <FormControl sx={{ mb: 2 }} variant="outlined">
+                      <TextField
+                        sx={{
+                          width: { sm: 200, md: 450 },
+                        }}
+                        label={`New Product`}
+                        variant="outlined"
+                        name="product"
+                        id="product"
+                        type="text"
+                        value={newProduct}
+                        onChange={() => setNewProduct(event.target.value)}
+                        helperText={errors.product ?? ""}
+                      />
+                    </FormControl>
+                    <Button
+                      sx={styles.addMore}
+                      onClick={addNewProduct}
+                      variant="contained"
+                      color="success"
+                      type="submit"
+                    >
+                      + Add New Product
+                    </Button>
+                  </>
+                )}
               </Form>
             </>
           )}
         </Formik>
-        <Button
-          type="submit"
-          variant="contained"
-          sx={styles.submit}
-          onClick={handleUpdateCategory}
-        >
-          Update Category
-        </Button>
+        {isUpdateProcess ? (
+          <Button
+            type="submit"
+            variant="contained"
+            sx={styles.submit}
+            onClick={handleUpdateCategory}
+          >
+            Update Category
+          </Button>
+        ) : (
+          <Box sx={styles.displayFlex}>
+            <Button type="submit" variant="contained" sx={styles.submit} onClick={handleEdit}>
+              Edit
+            </Button>
+            <Button
+              sx={styles.submit}
+              variant="contained"
+              onClick={handleProcessType}
+            >
+              {"<Back"}
+            </Button>
+          </Box>
+        )}
       </Box>
     </Dialog>
   );

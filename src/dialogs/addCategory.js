@@ -39,7 +39,7 @@ export default function AddCategory(props) {
   });
 
   const onSubmit = async (values) => {
-    if (values.categoryName) {
+    if (!values.categoryName) return;
     let newProducts = []; 
     products.forEach((product, index) => {
       if (values[product]) {
@@ -52,7 +52,6 @@ export default function AddCategory(props) {
     });
     addItem(values.categoryName.trim().length? values.categoryName : "No Name", newProducts);
     handleClose();
-    }
   };
 
   const addMoreProduct = () => {
@@ -62,7 +61,7 @@ export default function AddCategory(props) {
   return (
     <Dialog open={open} fullWidth={true} maxWidth="sm">
       <DialogTitle sx={styles.title}>
-        {"Add New Category"}
+        Add New Category
         <IconButton
           aria-label="close"
           onClick={handleClose}

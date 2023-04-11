@@ -15,6 +15,9 @@ export default function Editor() {
   const { push } = useRouter();
   const [isDrawingMode, setIsDrawingMode] = useState(false);
 
+  // Selected Category and Its selected products from edit modal
+  const [selectedCategory, setSelectedCategory] = useState({}); 
+
   useEffect(() => {
     if (!selected.hasOwnProperty("image")) {
       push("/home");
@@ -138,7 +141,9 @@ export default function Editor() {
         }}
       >
         <Box sx={{ border: "2px solid grey", gridArea: "side" }}>
-          <SideBar />
+          <SideBar 
+            setSelectedCategory={setSelectedCategory}
+          />
         </Box>
         <Box sx={{ gridArea: "main" }}>
           <div
