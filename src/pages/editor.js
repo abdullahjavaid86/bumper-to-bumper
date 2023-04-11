@@ -1,10 +1,11 @@
 import { FabricJSCanvas, useFabricJSEditor } from "fabricjs-react";
 import React, { useContext, useEffect, useState } from "react";
-
 import { ImageSelectionContext } from "@/contexts/image-selection-context";
 import { fabric } from "fabric";
 import jsPDF from "jspdf";
 import { useRouter } from "next/router";
+import { Box } from "@mui/material";
+import SideBar from "@/components/sideBar";
 
 export default function Editor() {
   const { editor, onReady } = useFabricJSEditor();
@@ -122,39 +123,58 @@ export default function Editor() {
   };
 
   return (
-    <>
-      <div
-        style={{
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          position: "relative",
-          backgroundColor: "#fff",
+    <Box
+      sx={{
+        width: "100%",
+        height: "100%",
+      }}
+    >
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "20% 80%",
+          gridTemplateRows: "auto",
+          gridTemplateAreas: `"side   main"`,
         }}
       >
-        <FabricJSCanvas
-          style={{ width: "100%", height: "100%" }}
-          onReady={onReady}
-        />
-      </div>
+        <Box sx={{ border: "2px solid grey", gridArea: "side" }}>
+          <SideBar />
+        </Box>
+        <Box sx={{ gridArea: "main" }}>
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "relative",
+              backgroundColor: "#fff",
+            }}
+          >
+            <FabricJSCanvas
+              style={{ width: "100%", height: "100%" }}
+              onReady={onReady}
+            />
+          </div>
 
-      <div className="canvas_actions">
-        <button onClick={onAddCircle}>Add Circle</button>
-        <button onClick={onAddRectangle}>Add Rectangle</button>
-        <button onClick={onAddLine}>Add Line</button>
-        <button onClick={() => onAddText("some text")}>Add Text</button>
-        <button
-          onClick={toggleDrawingMode}
-          className={isDrawingMode ? "drawing_mode" : ""}
-        >
-          Toggle Drawing mode
-        </button>
-        <button onClick={deleteSelected}>Delete Selected</button>
-        <button onClick={deleteAll}>Delete All</button>
-        <button onClick={onDownload}>Export as PDF</button>
-        <button onClick={onImageAdd}>Add Image</button>
-      </div>
-    </>
+          <div className="canvas_actions">
+            <button onClick={onAddCircle}>Add Circle</button>
+            <button onClick={onAddRectangle}>Add Rectangle</button>
+            <button onClick={onAddLine}>Add Line</button>
+            <button onClick={() => onAddText("some text")}>Add Text</button>
+            <button
+              onClick={toggleDrawingMode}
+              className={isDrawingMode ? "drawing_mode" : ""}
+            >
+              Toggle Drawing mode
+            </button>
+            <button onClick={deleteSelected}>Delete Selected</button>
+            <button onClick={deleteAll}>Delete All</button>
+            <button onClick={onDownload}>Export as PDF</button>
+            <button onClick={onImageAdd}>Add Image</button>
+          </div>
+        </Box>
+      </Box>
+    </Box>
   );
 }
