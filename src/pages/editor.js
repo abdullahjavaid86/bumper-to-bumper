@@ -86,6 +86,41 @@ export default function Editor() {
     pdf.save(`${selected.image}.pdf`);
   };
 
+  const onImageAdd = () => {
+    const canvas = editor.canvas;
+
+    fabric.util.loadImage(
+      "https://images.unsplash.com/photo-1681115085351-4c207e8e4ff9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80",
+      (img) => {
+        const img1 = new fabric.Image(img);
+        img1.set({
+          left: 0,
+          top: 0,
+          width: 150,
+          height: 150,
+          opacity: 0.3,
+        });
+        canvas.add(img1);
+        canvas.centerObject(img1);
+      },
+      null,
+      {
+        crossOrigin: "anonymous",
+      }
+    );
+
+    const textbox = new fabric.Textbox("Lorum ipsum dolor sit amet", {
+      left: 50,
+      top: 50,
+      width: 200,
+      fontSize: 12,
+      fontWeight: "bold",
+    });
+
+    canvas.add(textbox);
+    canvas.centerObject(textbox);
+  };
+
   return (
     <>
       <div
@@ -118,6 +153,7 @@ export default function Editor() {
         <button onClick={deleteSelected}>Delete Selected</button>
         <button onClick={deleteAll}>Delete All</button>
         <button onClick={onDownload}>Export as PDF</button>
+        <button onClick={onImageAdd}>Add Image</button>
       </div>
     </>
   );
