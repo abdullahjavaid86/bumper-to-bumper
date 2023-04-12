@@ -8,13 +8,12 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import InboxIcon from "@mui/icons-material/Inbox";
-import { useState } from "react";
-import { PRODUCT_CATEGORY } from "@/constants/productCategories";
+import { Fragment, useState } from "react";
+
 import AddCategory from "@/dialogs/addCategory";
-import { Category } from "@mui/icons-material";
 import CategoryDetails from "@/dialogs/categoryDetails";
-import { display } from "@mui/system";
+import InboxIcon from "@mui/icons-material/Inbox";
+import { PRODUCT_CATEGORY } from "@/constants/productCategories";
 
 const styles = {
   addButton: {
@@ -25,7 +24,6 @@ const styles = {
 };
 
 export default function SideBar(props) {
-
   const { setSelectedCategory, renderCategoryDetails } = props;
   const [categoryList, setCategoryList] = useState(PRODUCT_CATEGORY);
   const [openNewCategory, setOpenNewCategory] = useState(false);
@@ -56,7 +54,7 @@ export default function SideBar(props) {
       {
         id: categoryList.length + 1,
         category: categoryName,
-        products: products,
+        products,
       },
     ]);
   };
@@ -64,7 +62,7 @@ export default function SideBar(props) {
   const updateCategoryItem = (id, products) => {
     setCategoryList(
       categoryList.map((category) =>
-        category.id === id ? { ...category, products: products } : category
+        category.id === id ? { ...category, products } : category
       )
     );
   };
@@ -75,22 +73,26 @@ export default function SideBar(props) {
         <nav aria-label="main mailbox folders">
           <List>
             {categoryList.length ? (
-              categoryList.map((item, index) => (
-                <>
+              categoryList.map((item) => (
+                <Fragment key={item.id}>
                   <ListItem
                     onClick={() => handleOpenCategoryDetails(item)}
-                    key={index}
                     disablePadding
                   >
                     <ListItemButton>
                       <ListItemIcon>
                         <InboxIcon />
                       </ListItemIcon>
-                      <ListItemText primary={`${item.category}`} />
+                      <ListItemText
+                        primary={`${item.category}`}
+                        sx={{
+                          color: "#000",
+                        }}
+                      />
                     </ListItemButton>
                   </ListItem>
                   <Divider />
-                </>
+                </Fragment>
               ))
             ) : (
               <span style={{ color: "red" }}>No Categories Found!</span>
