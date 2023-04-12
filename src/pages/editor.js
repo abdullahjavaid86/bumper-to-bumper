@@ -1,11 +1,13 @@
 import { FabricJSCanvas, useFabricJSEditor } from "fabricjs-react";
 import React, { useContext, useEffect, useState } from "react";
+
+import { Box } from "@mui/material";
 import { ImageSelectionContext } from "@/contexts/image-selection-context";
+import SideBar from "@/components/sideBar";
 import { fabric } from "fabric";
+import { isEmpty } from "@/utils/common";
 import jsPDF from "jspdf";
 import { useRouter } from "next/router";
-import { Box } from "@mui/material";
-import SideBar from "@/components/sideBar";
 
 export default function Editor() {
   const { editor, onReady } = useFabricJSEditor();
@@ -14,9 +16,7 @@ export default function Editor() {
 
   const { push } = useRouter();
   const [isDrawingMode, setIsDrawingMode] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState({}); 
-
-  const isEmpty = (object) => JSON.stringify(object) === "{}"? true : false;
+  const [selectedCategory, setSelectedCategory] = useState({});
 
   useEffect(() => {
     if (!selected.hasOwnProperty("image")) {
@@ -51,9 +51,6 @@ export default function Editor() {
     editor.canvas.renderAll();
   }, [editor?.canvas.backgroundImage]);
 
-  const onAddCircle = () => {
-    editor.addCircle();
-  };
   const onAddRectangle = () => {
     editor.addRectangle();
   };
@@ -94,7 +91,7 @@ export default function Editor() {
     const canvas = editor.canvas;
 
     fabric.util.loadImage(
-      "https://images.unsplash.com/photo-1681115085351-4c207e8e4ff9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80",
+      "/image2.jpg",
       (img) => {
         const img1 = new fabric.Image(img);
         img1.set({
@@ -112,21 +109,10 @@ export default function Editor() {
         crossOrigin: "anonymous",
       }
     );
-
-    const textbox = new fabric.Textbox("Lorum ipsum dolor sit amet", {
-      left: 50,
-      top: 50,
-      width: 200,
-      fontSize: 12,
-      fontWeight: "bold",
-    });
-
-    canvas.add(textbox);
-    canvas.centerObject(textbox);
   };
 
-  const renderCategoryDetails = () => { 
-    if(isEmpty(selectedCategory)) return;
+  const renderCategoryDetails = () => {
+    if (isEmpty(selectedCategory)) return;
     const canvas = editor.canvas;
     const categoryNameBox = new fabric.Textbox(selectedCategory.category, {
       left: 50,
@@ -134,20 +120,19 @@ export default function Editor() {
       width: 200,
       fontSize: 14,
       fontWeight: "bold",
-      backgroundColor: "#1565C0"
+      backgroundColor: "#1565C0",
     });
     canvas.add(categoryNameBox);
-    selectedCategory.products.forEach((product)=> {
+    selectedCategory.products.forEach((product, index) => {
       const productNameBox = new fabric.Textbox(product.name, {
         left: 50,
-        top: 50,
+        top: 100 + index * 50,
         width: 200,
         fontSize: 14,
-        backgroundColor: "#81b8f7"
+        backgroundColor: "#81b8f7",
       });
       canvas.add(productNameBox);
-    })
-
+    });
   };
 
   return (
@@ -166,7 +151,7 @@ export default function Editor() {
         }}
       >
         <Box sx={{ border: "2px solid grey", gridArea: "side" }}>
-          <SideBar 
+          <SideBar
             setSelectedCategory={setSelectedCategory}
             renderCategoryDetails={renderCategoryDetails}
           />
@@ -179,7 +164,6 @@ export default function Editor() {
               alignItems: "center",
               justifyContent: "center",
               position: "relative",
-              backgroundColor: "#fff",
             }}
           >
             <FabricJSCanvas
@@ -189,8 +173,7 @@ export default function Editor() {
           </div>
 
           <div className="canvas_actions">
-            <button onClick={onAddCircle}>Add Circle</button>
-            <button onClick={onAddRectangle}>Add Rectangle</button>
+            <button onClick={onAddRectangle}>Add Box</button>
             <button onClick={onAddLine}>Add Line</button>
             <button onClick={() => onAddText("some text")}>Add Text</button>
             <button
