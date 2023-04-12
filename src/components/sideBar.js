@@ -24,7 +24,8 @@ const styles = {
 };
 
 export default function SideBar(props) {
-  const { setSelectedCategory, renderCategoryDetails } = props;
+
+  const { setSelectedCategory } = props;
   const [categoryList, setCategoryList] = useState(PRODUCT_CATEGORY);
   const [openNewCategory, setOpenNewCategory] = useState(false);
   const [openCategoryDetails, setOpenCategoryDetails] = useState(false);
@@ -127,7 +128,6 @@ export default function SideBar(props) {
         itemData={dialogData}
         upDateItem={updateCategoryItem}
         setSelectedCategory={setSelectedCategory}
-        renderCategoryDetails={renderCategoryDetails}
       />
     </>
   );
