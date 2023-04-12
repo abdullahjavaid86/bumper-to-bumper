@@ -1,6 +1,5 @@
 import { FabricJSCanvas, useFabricJSEditor } from "fabricjs-react";
 import React, { useContext, useEffect, useState } from "react";
-
 import { Box } from "@mui/material";
 import { ImageSelectionContext } from "@/contexts/image-selection-context";
 import SideBar from "@/components/sideBar";
@@ -8,14 +7,29 @@ import { fabric } from "fabric";
 import { isEmpty } from "@/utils/common";
 import jsPDF from "jspdf";
 import { useRouter } from "next/router";
+import ImageSelector from "@/dialogs/imageSelector";
+
+const styles = {
+  action: {
+    backgroundColor: "#1565C0",
+    border: `1px solid #1565C0`,
+    borderRadius: "3px",
+    letterSpacing: "1px",
+    color: "white",
+    fontWeight: "bold",
+    cursor: "pointer",
+    fontSize: "15px",
+    padding: "6px",
+  },
+};
 
 export default function Editor() {
   const { editor, onReady } = useFabricJSEditor();
-
   const { selected } = useContext(ImageSelectionContext);
 
   const { push } = useRouter();
   const [isDrawingMode, setIsDrawingMode] = useState(false);
+  const [openImageSelector, setOpenImageSelector] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState({});
 
   useEffect(() => {
@@ -45,11 +59,25 @@ export default function Editor() {
     if (!editor || !fabric) {
       return;
     }
-    editor.canvas.setHeight(500);
-    editor.canvas.setWidth(500);
+    editor.canvas.setHeight(600);
+    editor.canvas.setWidth(800);
     addBackground();
     editor.canvas.renderAll();
   }, [editor?.canvas.backgroundImage]);
+
+  useEffect(()=> {
+    if(!isEmpty(selectedCategory)) {
+      renderCategoryDetails();
+    }
+  },[selectedCategory]);
+
+  const handleOpenImageSelector = () => {
+    setOpenImageSelector(true);
+  }
+
+  const handleCloseImageSelector = () => {
+    setOpenImageSelector(false);
+  }
 
   const onAddRectangle = () => {
     editor.addRectangle();
@@ -87,11 +115,11 @@ export default function Editor() {
     pdf.save(`${selected.image}.pdf`);
   };
 
-  const onImageAdd = () => {
+  const onImageAdd = (imageSrc) => {
     const canvas = editor.canvas;
 
     fabric.util.loadImage(
-      "/image2.jpg",
+      imageSrc,
       (img) => {
         const img1 = new fabric.Image(img);
         img1.set({
@@ -99,7 +127,6 @@ export default function Editor() {
           top: 0,
           width: 150,
           height: 150,
-          opacity: 0.3,
         });
         canvas.add(img1);
         canvas.centerObject(img1);
@@ -112,7 +139,6 @@ export default function Editor() {
   };
 
   const renderCategoryDetails = () => {
-    if (isEmpty(selectedCategory)) return;
     const canvas = editor.canvas;
     const categoryNameBox = new fabric.Textbox(selectedCategory.category, {
       left: 50,
@@ -126,13 +152,14 @@ export default function Editor() {
     selectedCategory.products.forEach((product, index) => {
       const productNameBox = new fabric.Textbox(product.name, {
         left: 50,
-        top: 100 + index * 50,
+        top: 70 + index * 19,
         width: 200,
         fontSize: 14,
         backgroundColor: "#81b8f7",
       });
       canvas.add(productNameBox);
     });
+    setSelectedCategory({});
   };
 
   return (
@@ -153,7 +180,6 @@ export default function Editor() {
         <Box sx={{ border: "2px solid grey", gridArea: "side" }}>
           <SideBar
             setSelectedCategory={setSelectedCategory}
-            renderCategoryDetails={renderCategoryDetails}
           />
         </Box>
         <Box sx={{ gridArea: "main" }}>
@@ -173,22 +199,28 @@ export default function Editor() {
           </div>
 
           <div className="canvas_actions">
-            <button onClick={onAddRectangle}>Add Box</button>
-            <button onClick={onAddLine}>Add Line</button>
-            <button onClick={() => onAddText("some text")}>Add Text</button>
+            <button style={styles.action} onClick={onAddRectangle}>Add Box</button>
+            <button style={styles.action} onClick={onAddLine}>Add Line</button>
+            <button style={styles.action} onClick={() => onAddText("some text")}>Add Text</button>
             <button
               onClick={toggleDrawingMode}
               className={isDrawingMode ? "drawing_mode" : ""}
+              style={styles.action}
             >
               Toggle Drawing mode
             </button>
-            <button onClick={deleteSelected}>Delete Selected</button>
-            <button onClick={deleteAll}>Delete All</button>
-            <button onClick={onDownload}>Export as PDF</button>
-            <button onClick={onImageAdd}>Add Image</button>
+            <button style={styles.action} onClick={deleteSelected}>Delete Selected</button>
+            <button style={styles.action} onClick={deleteAll}>Delete All</button>
+            <button style={styles.action} onClick={onDownload}>Export as PDF</button>
+            <button style={styles.action} onClick={handleOpenImageSelector}>Add Image</button>
           </div>
         </Box>
       </Box>
+      <ImageSelector
+        open={openImageSelector}
+        handleClose={handleCloseImageSelector}
+        onSelectImage={onImageAdd}
+      />
     </Box>
   );
 }

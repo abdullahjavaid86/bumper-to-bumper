@@ -7,6 +7,7 @@ import {
   DialogTitle,
   Divider,
   FormControl,
+  FormControlLabel,
   IconButton,
   List,
   ListItem,
@@ -77,14 +78,7 @@ const EditModeStyled = styled.span`
 `;
 
 export default function CategoryDetails(props) {
-  const {
-    open,
-    handleClose,
-    itemData,
-    upDateItem,
-    setSelectedCategory,
-    renderCategoryDetails,
-  } = props;
+  const { open, handleClose, itemData, upDateItem, setSelectedCategory } = props;
   const [newProduct, setNewProduct] = useState("");
   const [products, setProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
@@ -115,12 +109,7 @@ export default function CategoryDetails(props) {
   };
 
   const handleEdit = () => {
-    setSelectedCategory({
-      id: itemData.id,
-      category: itemData.category,
-      products: selectedProducts,
-    });
-    renderCategoryDetails();
+    setSelectedCategory({ id: itemData.id, category: itemData.category, products: selectedProducts });
     handleCloseDialog();
   };
 
@@ -204,25 +193,32 @@ export default function CategoryDetails(props) {
                   <Fragment key={product.id}>
                     <ListItem disablePadding>
                       {!isUpdateProcess && (
-                        <Checkbox
-                          color="success"
-                          onClick={() => {
-                            handleSelectedProduct(product);
-                          }}
+                        <FormControlLabel  
+                          control= {
+                            <Checkbox
+                              color="success"
+                              onClick={() => {
+                                handleSelectedProduct(product);
+                              }}
+                           />
+                          }
+                          label={product.name}
                         />
                       )}
-                      <ListItemButton>
-                        <ListItemText primary={`${product.name}`} />
-                      </ListItemButton>
                       {isUpdateProcess && (
-                        <IconButton
-                          title="Delete Product"
-                          onClick={() => {
-                            handleDeleteProducts(product.id);
-                          }}
-                        >
-                          <RemoveIcon color="#BDBDBD" />
-                        </IconButton>
+                        <>
+                          <ListItemButton>
+                            <ListItemText primary={product.name} />
+                          </ListItemButton>
+                          <IconButton
+                            title="Delete Product"
+                            onClick={() => {
+                              handleDeleteProducts(product.id);
+                            }}
+                          >
+                            <RemoveIcon color="#BDBDBD" />
+                          </IconButton>
+                        </>
                       )}
                     </ListItem>
                     <Divider />
